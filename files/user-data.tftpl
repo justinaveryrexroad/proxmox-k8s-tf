@@ -1,0 +1,34 @@
+#cloud-config
+hostname: ${hostname}
+manage_etc_hosts: true
+fqdn: ${fqdn}
+user: ${username}
+ssh_authorized_keys:
+  - ${ssh_public_key}
+chpasswd:
+  expire: False
+users:
+  - default
+package_upgrade: true
+packages:
+  - keepalived
+  - zsh
+write_files:
+  - path: /etc/keepalived/keepalived.conf
+    permissions: "0644"
+    owner: root
+    content: |
+      vrrp_instance api_server {
+        state ${state}
+        interface eth0
+        virtual_router_id ${router_id}
+        priority ${priority}
+        advert_int 5
+        authentication {
+          auth_type PASS
+          auth_pass ${pass}
+        }
+        virtual_ipaddress {
+          ${ip}
+        }	
+      }
